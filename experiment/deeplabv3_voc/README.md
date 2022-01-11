@@ -1,4 +1,4 @@
-# deeplabv3+voc
+# deeplabv3_voc
 Here is the experiments of DeepLabv3+ on PASCAL VOC 2012 dataset.
 
 ## Dataset

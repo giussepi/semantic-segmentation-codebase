@@ -1,10 +1,9 @@
 """Dilated ResNet"""
 import math
 import torch
-import torch.utils.model_zoo as model_zoo
-import torch.nn as nn
-from net.sync_batchnorm import SynchronizedBatchNorm2d
-from utils.registry import BACKBONES
+from torch.utils import model_zoo
+from torch import nn
+from lib.utils.registry import BACKBONES
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152', 'BasicBlock', 'Bottleneck']
@@ -13,14 +12,15 @@ model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
     'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
     'resnet50': '~/.cache/torch/checkpoints/resnet50s-a75c83cf.pth',
-    'resnet101': '/home/wangyude/.cache/torch/checkpoints/resnet101s-03a0f310.pth',
+    'resnet101': 'checkpoints/resnet101s-03a0f310.pth',
     'resnet152': '~/.cache/torch/checkpoints/resnet152s-36670e8b.pth',
-    #'resnet50': 'https://s3.us-west-1.wasabisys.com/encoding/models/resnet50s-a75c83cf.zip',
-    #'resnet101': 'https://s3.us-west-1.wasabisys.com/encoding/models/resnet101s-03a0f310.zip',
-    #'resnet152': 'https://s3.us-west-1.wasabisys.com/encoding/models/resnet152s-36670e8b.zip'
+    # 'resnet50': 'https://s3.us-west-1.wasabisys.com/encoding/models/resnet50s-a75c83cf.zip',
+    # 'resnet101': 'https://s3.us-west-1.wasabisys.com/encoding/models/resnet101s-03a0f310.zip',
+    # 'resnet152': 'https://s3.us-west-1.wasabisys.com/encoding/models/resnet152s-36670e8b.zip'
 }
 mean = (0.485, 0.456, 0.406)
 std = (0.229, 0.224, 0.225)
+
 
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
@@ -32,6 +32,7 @@ class BasicBlock(nn.Module):
     """ResNet BasicBlock
     """
     expansion = 1
+
     def __init__(self, inplanes, planes, stride=1, dilation=1, downsample=None, previous_dilation=1,
                  norm_layer=None):
         super(BasicBlock, self).__init__()
@@ -69,6 +70,7 @@ class Bottleneck(nn.Module):
     """
     # pylint: disable=unused-argument
     expansion = 4
+
     def __init__(self, inplanes, planes, stride=1, dilation=1,
                  downsample=None, previous_dilation=1, norm_layer=None):
         super(Bottleneck, self).__init__()
@@ -141,6 +143,7 @@ class ResNet(nn.Module):
         - Yu, Fisher, and Vladlen Koltun. "Multi-scale context aggregation by dilated convolutions."
     """
     # pylint: disable=unused-variable
+
     def __init__(self, block, layers, dilated=True, multi_grid=False,
                  deep_base=True, norm_layer=nn.BatchNorm2d):
         self.inplanes = 128 if deep_base else 64
@@ -236,6 +239,7 @@ class ResNet(nn.Module):
         l4 = self.layer4(l3)
         return [l1, l2, l3, l4]
 
+
 @BACKBONES.register_module
 def resnet18(pretrained=False, **kwargs):
     """Constructs a ResNet-18 model.
@@ -273,10 +277,10 @@ def resnet50(pretrained=False, **kwargs):
     if pretrained:
         old_dict = model_zoo.load_url(model_urls['resnet50'])
         model_dict = model.state_dict()
-        old_dict = {k: v for k,v in old_dict.items() if (k in model_dict)}
+        old_dict = {k: v for k, v in old_dict.items() if (k in model_dict)}
         model_dict.update(old_dict)
-        model.load_state_dict(model_dict) 
-        print('%s loaded.'%model_urls['resnet50'])
+        model.load_state_dict(model_dict)
+        print('%s loaded.' % model_urls['resnet50'])
     return model
 
 
@@ -291,10 +295,10 @@ def resnet101(pretrained=False, **kwargs):
     if pretrained:
         old_dict = torch.load(model_urls['resnet101'])
         model_dict = model.state_dict()
-        old_dict = {k: v for k,v in old_dict.items() if (k in model_dict)}
+        old_dict = {k: v for k, v in old_dict.items() if (k in model_dict)}
         model_dict.update(old_dict)
-        model.load_state_dict(model_dict) 
-        print('%s loaded.'%model_urls['resnet101'])
+        model.load_state_dict(model_dict)
+        print('%s loaded.' % model_urls['resnet101'])
     return model
 
 
@@ -309,8 +313,8 @@ def resnet152(pretrained=False, **kwargs):
     if pretrained:
         old_dict = model_zoo.load_url(model_urls['resnet152'])
         model_dict = model.state_dict()
-        old_dict = {k: v for k,v in old_dict.items() if (k in model_dict)}
+        old_dict = {k: v for k, v in old_dict.items() if (k in model_dict)}
         model_dict.update(old_dict)
-        model.load_state_dict(model_dict) 
-        print('%s loaded.'%model_urls['resnet152'])
+        model.load_state_dict(model_dict)
+        print('%s loaded.' % model_urls['resnet152'])
     return model

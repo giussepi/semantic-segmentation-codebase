@@ -9,12 +9,13 @@
 #from net.clsnet import ClsNet
 #from net.fcn import FCN
 #from net.DFANet import DFANet
-from utils.registry import NETS
+from lib.utils.registry import NETS
+
 
 def generate_net(cfg, **kwargs):
-	net = NETS.get(cfg.MODEL_NAME)(cfg, **kwargs)
-	return net
-#def generate_net(cfg):
+    net = NETS.get(cfg.MODEL_NAME)(cfg, **kwargs)
+    return net
+# def generate_net(cfg):
 #	if cfg.MODEL_NAME == 'deeplabv3plus' or cfg.MODEL_NAME == 'deeplabv3+':
 #		return deeplabv3plus(cfg)
 #	elif cfg.MODEL_NAME == 'deeplabv3':
@@ -32,6 +33,6 @@ def generate_net(cfg, **kwargs):
 #	elif cfg.MODEL_NAME == 'fcn' or cfg.MODEL_NAME == 'FCN':
 #		return FCN(cfg)
 #	elif cfg.MODEL_NAME == 'DFANet' or cfg.MODEL_NAME == 'dfanet':
-#		return DFANet(cfg)	
+#		return DFANet(cfg)
 #	else:
 #		raise ValueError('generateNet.py: network %s is not support yet'%cfg.MODEL_NAME)

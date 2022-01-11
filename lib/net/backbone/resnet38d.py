@@ -2,10 +2,11 @@ import torch
 from torch import nn
 import numpy as np
 import torch.nn.functional as F
-from utils.registry import BACKBONES
+from lib.utils.registry import BACKBONES
 
-model_url='/home1/wangyude/project/SEAM/models/ilsvrc-cls_rna-a1_cls1000_ep-0001.params'
+model_url = '/home1/wangyude/project/SEAM/models/ilsvrc-cls_rna-a1_cls1000_ep-0001.params'
 bn_mom = 0.0003
+
 
 class ResBlock(nn.Module):
     def __init__(self, in_channels, mid_channels, out_channels, stride=1, first_dilation=None, dilation=1, norm_layer=nn.BatchNorm2d):
@@ -14,7 +15,8 @@ class ResBlock(nn.Module):
 
         self.same_shape = (in_channels == out_channels and stride == 1)
 
-        if first_dilation == None: first_dilation = dilation
+        if first_dilation == None:
+            first_dilation = dilation
 
         self.bn_branch2a = self.norm_layer(in_channels, momentum=bn_mom, affine=True)
 
@@ -55,6 +57,7 @@ class ResBlock(nn.Module):
     def __call__(self, x, get_x_bn_relu=False):
         return self.forward(x, get_x_bn_relu=get_x_bn_relu)
 
+
 class ResBlock_bot(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1, dilation=1, dropout=0., norm_layer=nn.BatchNorm2d):
         super(ResBlock_bot, self).__init__()
@@ -67,7 +70,8 @@ class ResBlock_bot(nn.Module):
 
         self.bn_branch2b1 = self.norm_layer(out_channels//4, momentum=bn_mom, affine=True)
         self.dropout_2b1 = torch.nn.Dropout2d(dropout)
-        self.conv_branch2b1 = nn.Conv2d(out_channels//4, out_channels//2, 3, padding=dilation, dilation=dilation, bias=False)
+        self.conv_branch2b1 = nn.Conv2d(out_channels//4, out_channels//2, 3,
+                                        padding=dilation, dilation=dilation, bias=False)
 
         self.bn_branch2b2 = self.norm_layer(out_channels//2, momentum=bn_mom, affine=True)
         self.dropout_2b2 = torch.nn.Dropout2d(dropout)
@@ -106,8 +110,9 @@ class ResBlock_bot(nn.Module):
     def __call__(self, x, get_x_bn_relu=False):
         return self.forward(x, get_x_bn_relu=get_x_bn_relu)
 
+
 class Normalize():
-    def __init__(self, mean = (0.485, 0.456, 0.406), std = (0.229, 0.224, 0.225)):
+    def __init__(self, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)):
 
         self.mean = mean
         self.std = std
@@ -121,6 +126,7 @@ class Normalize():
         proc_img[..., 2] = (imgarr[..., 2] / 255. - self.mean[2]) / self.std[2]
 
         return proc_img
+
 
 class Net(nn.Module):
     def __init__(self, norm_layer=nn.BatchNorm2d):
@@ -213,6 +219,7 @@ class Net(nn.Module):
 
         return
 
+
 def convert_mxnet_to_torch(filename):
     import mxnet
 
@@ -263,10 +270,11 @@ def convert_mxnet_to_torch(filename):
 
     return renamed_dict
 
+
 @BACKBONES.register_module
 def resnet38(pretrained=False, norm_layer=nn.BatchNorm2d, **kwargs):
     model = Net(norm_layer)
     if pretrained:
         weight_dict = convert_mxnet_to_torch(model_url)
-        model.load_state_dict(weight_dict,strict=False) 
+        model.load_state_dict(weight_dict, strict=False)
     return model
